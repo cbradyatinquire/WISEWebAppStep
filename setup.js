@@ -19,8 +19,8 @@ var coreScripts = [
 
 var studentVLEScripts = [
     //NOTE:  NOT SURE WHY I DISABLED THESE IN TEST STEP.
-	/*scriptloader.jquerySrc,
-	scriptloader.jqueryUISrc,*/
+	scriptloader.jquerySrc,
+	scriptloader.jqueryUISrc,
  	/*
      * TODO: rename webApp
      * TODO: rename webApp.js

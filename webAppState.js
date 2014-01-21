@@ -38,7 +38,7 @@
  * @constructor
  */
 function WebAppState(response, statestring, gradingHTML ) {
-	console.log("DEBUG: entered constructor in testTypeState.js");
+	console.log("DEBUG: entered constructor in webappstate.js");
 
 	this.response = "";
 	this.stateString = "";

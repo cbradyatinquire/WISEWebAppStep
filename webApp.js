@@ -125,7 +125,7 @@ WebApp.prototype.getLatestState = function() {
 				statestr = JSON.stringify(statestr);
 			}
 			console.log("going to load ... " + statestr);
-			latestState = new TestTypeState("",statestr,"");
+			latestState = new WebAppState("",statestr,"");
 		}
 	}
 	
@@ -159,7 +159,7 @@ WebApp.prototype.save = function() {
 		console.log("DEBUG:  response data = " + response);
 	
 	
-		var webAppState = new WebAppState(response);
+		var webAppState = new WebAppState(response, statestring, gradingHTML);
 		console.log(webAppState);
 		/*
 		 * fire the event to push this state to the global view.states object.
