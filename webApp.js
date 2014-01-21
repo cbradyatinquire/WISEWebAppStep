@@ -45,6 +45,13 @@ function WebApp(node) {
 	} else {
 		this.states = [];  
 	};
+	
+	this.api = {
+		"version":0.1
+	};
+	
+	this.api.triggerSaveState = function(  ) { save(); };
+	this.api.appReady = function() { console.log("app tells us it's ready"); };
 };
 
 /**
@@ -60,23 +67,37 @@ function WebApp(node) {
  * the .html file for this step (look at webApp.html).
  */
 WebApp.prototype.render = function() {
+	
+	
+	var iframe = document.getElementById("ouriframe");
+	console.log("SETTING THE HEIGHT TO " + this.content.height + " and the WIDTH to " + this.content.width);
+	iframe.width = this.content.width;
+	iframe.height = this.content.height;
+	var mypath = this.view.config.getConfigParam("getContentBaseUrl") + "assets/";
+	
 	//display any prompts to the student
 	$('#promptDiv').html(this.content.prompt);
 	
 	//load any previous responses the student submitted for this step
 	var latestState = this.getLatestState();
-	
+	var latestResponse = "";
 	if(latestState != null) {
 		/*
 		 * get the response from the latest state. the response variable is
 		 * just provided as an example. you may use whatever variables you
 		 * would like from the state object (look at webAppState.js)
 		 */
-		var latestResponse = latestState.response;
-		
-		//set the previous student work into the text area
-		$('#studentResponseTextArea').val(latestResponse); 
+		latestResponse = latestState.response;
 	}
+	//set the previous student work into the text area
+	$('#studentResponseTextArea').val(latestResponse);
+	
+	console.log("setting up getLatestState API call......");
+	this.api.getLatestState = function() { console.log("using api's getLatestState"); return latestState; }
+	console.log(".....it is expected to return " + latestState);
+	
+	//NOTE: I do this last in proof of concept to detect if there were any surprise crashes in the above 
+	iframe.src = mypath + this.content.url;
 };
 
 /**
@@ -94,6 +115,18 @@ WebApp.prototype.getLatestState = function() {
 	if(this.states != null && this.states.length > 0) {
 		//get the last state
 		latestState = this.states[this.states.length - 1];
+	} else {
+		console.log("******There are NO prior states; loading initialState from the authored JSON, if it exists");
+		var statestr = this.content.initialState;
+
+		if ( statestr ) {  
+			//it might be a JSON object itself... (that or a string)
+			if ((typeof statestr) == 'object') {
+				statestr = JSON.stringify(statestr);
+			}
+			console.log("going to load ... " + statestr);
+			latestState = new TestTypeState("",statestr,"");
+		}
 	}
 	
 	return latestState;
@@ -110,41 +143,36 @@ WebApp.prototype.getLatestState = function() {
  * the .html file for this step (look at webApp.html).
  */
 WebApp.prototype.save = function() {
+	console.log("DEBUG: entered function save() in testType.js");
 	//get the answer the student wrote
-	var response = $('#studentResponseTextArea').val();
+	var response = document.getElementById('studentResponseTextArea').value;
 	
-	/*
-	 * create the student state that will store the new work the student
-	 * just submitted
-	 * 
-	 * TODO: rename WebAppState
-	 * 
-	 * make sure you rename WebAppState to the state object type
-	 * that you will use for representing student data for this
-	 * type of step. copy and modify the file below
-	 * 
-	 * vlewrapper/WebContent/vle/node/webApp/webAppState.js
-	 * 
-	 * and use the object defined in your new state.js file instead
-	 * of WebAppState. for example if you are creating a new
-	 * quiz step type you would copy the file above to
-	 * 
-	 * vlewrapper/WebContent/vle/node/quiz/quizState.js
-	 * 
-	 * and in that file you would define QuizState and therefore
-	 * would change the WebAppState to QuizState below
-	 */
-	var webAppState = new WebAppState(response);
+	var stateGetter = document.getElementById("ouriframe").contentWindow.provideStateString;
+	var gradingHTMLGetter = document.getElementById("ouriframe").contentWindow.provideGradingViewHTML
 	
-	/*
-	 * fire the event to push this state to the global view.states object.
-	 * the student work is saved to the server once they move on to the
-	 * next step.
-	 */
-	this.view.pushStudentWork(this.node.id, webAppState);
+	if ( stateGetter && gradingHTMLGetter ) {
+		var statestring = document.getElementById("ouriframe").contentWindow.provideStateString();
+		var gradingHTML = document.getElementById("ouriframe").contentWindow.provideGradingViewHTML();
+	
+		console.log("DEBUG:  grading view HTML=" + gradingHTML);
+		console.log("DEBUG:  State string data=" + statestring);
+		console.log("DEBUG:  response data = " + response);
+	
+	
+		var webAppState = new WebAppState(response);
+		console.log(webAppState);
+		/*
+		 * fire the event to push this state to the global view.states object.
+		 * the student work is saved to the server once they move on to the
+		 * next step.
+		 */
+		this.view.pushStudentWork(this.node.id, webAppState);
 
-	//push the state object into this or object's own copy of states
-	this.states.push(webAppState);
+		//push the state object into this or object's own copy of states
+		this.states.push(webAppState);
+		console.log(this.states);
+		console.log("there are " + this.states.length + " states");
+	}
 };
 
 //used to notify scriptloader that this script has finished loading

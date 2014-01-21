@@ -37,13 +37,21 @@
  * 
  * @constructor
  */
-function WebAppState(response) {
-	//the text response the student wrote
+function WebAppState(response, statestring, gradingHTML ) {
+	console.log("DEBUG: entered constructor in testTypeState.js");
+
 	this.response = "";
+	this.stateString = "";
+	this.gradingViewHTML = "<html>test</html>";
 
 	if(response != null) {
-		//set the response
 		this.response = response;
+	}
+	if(statestring != null) {
+		this.stateString = statestring;
+	}
+	if(gradingHTML != null) {
+		this.gradingViewHTML = gradingHTML;
 	}
 };
 
@@ -64,12 +72,12 @@ function WebAppState(response) {
 WebAppState.prototype.parseDataJSONObj = function(stateJSONObj) {
 	//obtain the student work from the JSONObject
 	var response = stateJSONObj.response;
-	
+	var statestring = stateJSONObj.stateString;
+	var gradingHTML = stateJSONObj.gradingViewHTML;
 	/*
 	 * create a state object with the student work
-	 * TODO: rename WebAppState
 	 */
-	var webAppState = new WebAppState(response);
+	var webAppState = new WebAppState(response, statestring, gradingHTML);
 	
 	//return the state object
 	return webAppState;
