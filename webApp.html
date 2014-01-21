@@ -1,6 +1,14 @@
 <html>
 	<head>
 		<script type="text/javascript">
+		
+			function wiseAPI() {
+				if ( !(testType.api) ) {
+					console.log("NULL API OBJECT -- SHOULD NEVER HAPPEN");
+				}
+				return testType.api;
+			}
+			
 			/*
 			 * TODO: Copy this file and rename it to
 			 * 
@@ -65,6 +73,15 @@
 		         * the variable named quiz to the scripts array, you would change
 		         * 'webApp' to 'quiz'
 		         */
+				//NOTE:  added by corey --> WISE issue.
+				console.log("DEBUG:  about to dump 'this' variable from html file.");
+				console.log(this);
+				console.log("DEBUG:  About to call scriptloader in html file. Will test existence first.  if fails try to reassign");
+				if (typeof scriptloader === 'undefined') {
+					console.log("reassigning scriptloader variable!");
+					scriptloader = this.scriptloader;
+				}
+				//end added code...
 	        	scriptloader.loadScripts('webApp', document, node.id, eventManager);
 	        };
 
@@ -87,8 +104,9 @@
 		
 		<!-- the promptDiv, responseDiv, saveButtonDiv are not required, they are only provided as an example,
 			 you may delete all of these divs and create the body however you like -->
-		<div id='promptDiv'></div>
-		<div id='responseDiv'><textarea id='studentResponseTextArea' rows='8' cols='80'></textarea></div>
-		<div id='saveButtonDiv'><input type='button' value='Save' onclick='save()'></input></div>
+			<div id='promptDiv'></div>
+			<iframe id="ouriframe" width="100%" height="100%" seamless></iframe>
+			<div id='responseDiv'><textarea id='studentResponseTextArea' rows='8' cols='80'></textarea></div>
+		
 	</body>
 </html>
